@@ -38,3 +38,8 @@ Then, add the following settings to your `jupyter_config.py` file:
 c.LocalAuthenticator.add_user_cmd = ['/path/to/add_user.sh']
 ```
 
+<hr>
+<small>
+<p><a href="https://creativecommons.org/licenses/by-sa/4.0/"><img src="https://img.shields.io/badge/License-CC%20BY--SA%204.0-lightgrey.svg" alt="License: CC BY-SA 4.0" /></a></p>
+<p>Copyright 2017 Michael E. Cotterell (mepcott@uga.edu) and the University of Georgia. The documentation fot this work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>. The software projects described here may be subject to their own licenses. The content and opinions expressed on this Web page do not necessarily reflect the views of nor are they endorsed by the University of Georgia or the University System of Georgia.</p>
+</small>
