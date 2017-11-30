@@ -10,6 +10,16 @@ The project itself includes detailed instructions on how to replicate the proof 
 The two primary goals of this project are i) to make replicating the basic setup as easy and painless as possible; and ii) to not let modifications prevent the inclusion of existing contributions to the Jupyter and JupyterHub projects.
 This documentation project is free and open source under a Creative Commons license.
 
+## What is AODS JupyterHub?
+
+In a nutshell, AODS JupyterHub is a set of configuration settings and installation guides for setting up and deploying a [JupyterHub](https://jupyterhub.readthedocs.io/en/latest/) installation with [ScalaTion](http://cobweb.cs.uga.edu/~jam/scalation.html) notebook support provided by the [ScalaTion Kernel project](https://github.com/scalation/scalation_kernel) project. 
+It is not officially affiliated with the main JupyterHub project. 
+
+## Installing JupyterHub
+
+Users should consult the [installation guide](https://jupyterhub.readthedocs.io/en/latest/installation-guide.html) provided by the main JupyterHub project.
+If users only requires or need a local or containerized [Jupyter](http://jupyter.org) installation with [ScalaTion](http://cobweb.cs.uga.edu/~jam/scalation.html) notebook support, then they are encouraged to read to documentation provided by the [ScalaTion Kernel project](https://github.com/scalation/scalation_kernel).
+
 ## Social Authentication
 
 The AODS JupyterHub installation uses GitHub accounts to authenticate users using the [`oauthenticator`](https://github.com/jupyterhub/oauthenticator) package.
@@ -37,6 +47,50 @@ Then, add the following settings to your `jupyter_config.py` file:
 ```python
 c.LocalAuthenticator.add_user_cmd = ['/path/to/add_user.sh']
 ```
+
+## Adding the ScalaTion Kernel
+
+Users should consult the [installation instructions](https://github.com/scalation/scalation_kernel#general-installation-instructions) provided by the [ScalaTion Kernel project](https://github.com/scalation/scalation_kernel).
+
+## Deployment with Nginx
+
+A properly installed JupyterHub application does not need any additional dependencies to be deployed locally.
+Below is an example that starts the application locally on either the default port (port 8000) or the port specified in `jupyterhub_config.py`.
+Please ensure the environment variables point to the JAR files for a [ScalaTion](http://cobweb.cs.uga.edu/~jam/scalation.html) 1.3 (or higher) distribution if you have installed [ScalaTion Kernel](https://github.com/scalation/scalation_kernel).
+
+```
+$ export SCALATION_MATHSTAT_JAR="/path/to/scalation_mathstat.jar"
+$ export SCALATION_MODELING_JAR="/path/to/scalation_modeling.jar"
+$ /path/to/jupyterhub -f /path/to/jupyterhub_config.py
+```
+
+If you are using the Nginx webserver, then you can use an Nginx configuration similar to the following to proxy port 80 for a particular hostname (replace `hostname.tld`) so that it forwards to the JupyterHub application that is running locally on port 8000 (change if another port is used):
+
+```
+server {
+	listen 80;
+	server_name hostname.tld;
+
+	location / {
+		proxy_set_header Host $host;
+		proxy_set_header X-Real-IP $remote_addr;
+		proxy_pass http://127.0.0.1:8000;
+	}
+
+	location ~ /api/kernels/ {
+	        proxy_pass            http://127.0.0.1:8000;
+        	proxy_set_header      Host $host;
+		      proxy_set_header X-Real-IP $remote_addr;
+		      proxy_http_version    1.1;
+		      proxy_set_header      Upgrade "websocket";
+        	proxy_set_header      Connection "Upgrade";
+        	proxy_read_timeout    86400;
+    }
+
+}
+```
+
+Instructions for Apache2 are coming soon!
 
 <hr>
 <small>
