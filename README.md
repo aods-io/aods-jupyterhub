@@ -9,3 +9,32 @@ A proof of concept installation is hosted at [`aods.io`](http://aods.io/), prima
 The project itself includes detailed instructions on how to replicate the proof of concept setup in variety of ways, including as a containerized application (e.g., using Docker) [coming soon!].
 The two primary goals of this project are i) to make replicating the basic setup as easy and painless as possible; and ii) to not let modifications prevent the inclusion of existing contributions to the Jupyter and JupyterHub projects.
 This documentation project is free and open source under a Creative Commons license.
+
+## Social Authentication
+
+The AODS JupyterHub installation uses GitHub accounts to authenticate users using the [`oauthenticator`](https://github.com/jupyterhub/oauthenticator) package.
+Install this package following the instructions found [here](https://github.com/jupyterhub/oauthenticator).
+Next, setup an OATH App on GitHub following the instructions found [here](https://developer.github.com/apps/building-integrations/setting-up-and-registering-oauth-apps/registering-oauth-apps/).
+This will give you the information you need to fill out client information below.
+Now, add the following settings to your `jupyter_config.py` file:
+
+```python
+from oauthenticator.github import LocalGitHubOAuthenticator
+c.JupyterHub.authenticator_class = LocalGitHubOAuthenticator
+c.LocalGitHubOAuthenticator.oauth_callback_url = 'http://url/to/hub/oauth_callback'
+c.LocalGitHubOAuthenticator.client_id = ''
+c.LocalGitHubOAuthenticator.client_secret = ''
+c.LocalGitHubOAuthenticator.create_system_users = True
+```
+
+## Providing Default Notebooks
+
+The AODS JupyterHub installation provides copies of the latest example notebooks from the [ScalaTion Kernel project](https://github.com/scalation/scalation_kernel).
+These notebooks are supplied during the user creation proccess via the [`add_user.sh`](add_user.sh) script, which is called the first time a user authenticates with the JupyterHub installation.
+First, download the [`add_user.sh`](add_user.sh) script to a safe location on the system (we recommend placing it next to your `jupyterhub_config.py` file).
+Then, add the following settings to your `jupyter_config.py` file:
+
+```python
+c.LocalAuthenticator.add_user_cmd = ['/path/to/add_user.sh']
+```
+
