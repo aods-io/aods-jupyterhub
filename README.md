@@ -57,10 +57,13 @@ Users should consult the [installation instructions](https://github.com/scalatio
 A properly installed JupyterHub application does not need any additional dependencies to be deployed locally.
 Below is an example that starts the application locally on either the default port (port 8000) or the port specified in `jupyterhub_config.py`.
 Please ensure the environment variables point to the JAR files for a [ScalaTion](http://cobweb.cs.uga.edu/~jam/scalation.html) 1.3 (or higher) distribution if you have installed [ScalaTion Kernel](https://github.com/scalation/scalation_kernel).
+You must also configure JupyterHub to recognize the `SCALATION_JARS` environment 
+variable by adjusting the `c.Spawner.env_keep` or `c.Spawner.environment` options in
+`jupyterhub_config.py` appropriately.
 
 ```
-$ export SCALATION_MATHSTAT_JAR="/path/to/scalation_mathstat.jar"
-$ export SCALATION_MODELING_JAR="/path/to/scalation_modeling.jar"
+$ export SCALATION_JARS=/path/to/scalation_mathstat.jar
+$ export SCALATION_JARS=/path/to/scalation_modeling.jar:$SCALATION_JARS
 $ /path/to/jupyterhub -f /path/to/jupyterhub_config.py
 ```
 
@@ -77,12 +80,12 @@ server {
 		proxy_pass http://127.0.0.1:8000;
 	}
 
-	location ~ /api/kernels/ {
+	location ~* /(user/[^/]*)/(api/kernels/[^/]+/channels|terminals/websocket)/? {
 	        proxy_pass            http://127.0.0.1:8000;
-        	proxy_set_header      Host $host;
-		      proxy_set_header X-Real-IP $remote_addr;
-		      proxy_http_version    1.1;
-		      proxy_set_header      Upgrade "websocket";
+	        proxy_set_header      Host $host;
+	        proxy_set_header X-Real-IP $remote_addr;
+	        proxy_http_version    1.1;
+	        proxy_set_header      Upgrade "websocket";
         	proxy_set_header      Connection "Upgrade";
         	proxy_read_timeout    86400;
     }
